@@ -1,9 +1,10 @@
-export type Route = 
+export type Route =
   | { name: 'login' }
   | { name: 'tasks' }
   | { name: 'task-detail'; id: string }
   | { name: 'archive' }
-  | { name: 'settings' };
+  | { name: 'settings' }
+  | { name: 'envvars' };
 
 function getHash(): string {
   const h = window.location.hash.slice(1) || '/';
@@ -17,6 +18,7 @@ export function getRoute(): Route {
   if (parts[0] === 'tasks') return { name: 'tasks' };
   if (parts[0] === 'archive') return { name: 'archive' };
   if (parts[0] === 'settings') return { name: 'settings' };
+  if (parts[0] === 'envvars') return { name: 'envvars' };
   if (parts[0] === 'login' || hash === '/' || hash === '') return { name: 'login' };
   return { name: 'tasks' };
 }
@@ -29,6 +31,7 @@ export function navigateTo(route: Route): void {
     case 'task-detail': path = `/tasks/${route.id}`; break;
     case 'archive': path = '/archive'; break;
     case 'settings': path = '/settings'; break;
+    case 'envvars': path = '/envvars'; break;
   }
   window.location.hash = path;
 }

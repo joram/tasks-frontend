@@ -4,6 +4,7 @@ import { renderTasks, getListsState, switchList, createList, updateListInState, 
 import { renderTaskDetail } from './pages/task-detail.js';
 import { renderArchive } from './pages/archive.js';
 import { renderSettings } from './pages/settings.js';
+import { renderEnvVars } from './pages/envvars.js';
 import { api } from './api.js';
 
 const navIconTasks = '<svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
@@ -37,6 +38,7 @@ export function renderApp(container: HTMLElement, route: Route): void {
   const tasksActive = current.name === 'tasks' || current.name === 'task-detail';
   const archiveActive = current.name === 'archive';
   const settingsActive = current.name === 'settings';
+  const envvarsActive = current.name === 'envvars';
 
   container.innerHTML = `
     <div class="app-shell">
@@ -45,6 +47,7 @@ export function renderApp(container: HTMLElement, route: Route): void {
           <a href="#/tasks" class="${tasksActive ? 'active' : ''}" data-route="tasks">${navIconTasks} Tasks</a>
           <a href="#/archive" class="${archiveActive ? 'active' : ''}" data-route="archive">${navIconArchive} Archive</a>
           <a href="#/settings" class="${settingsActive ? 'active' : ''}" data-route="settings">${navIconSettings} Settings</a>
+          <a href="#/envvars" class="${envvarsActive ? 'active' : ''}" data-route="envvars">Env Vars</a>
         </nav>
         ${buildSidebarListsHtml()}
       </aside>
@@ -63,6 +66,7 @@ export function renderApp(container: HTMLElement, route: Route): void {
       if (r === 'tasks') navigateTo({ name: 'tasks' });
       else if (r === 'archive') navigateTo({ name: 'archive' });
       else if (r === 'settings') navigateTo({ name: 'settings' });
+      else if (r === 'envvars') navigateTo({ name: 'envvars' });
     });
   });
 
@@ -151,6 +155,9 @@ export function renderApp(container: HTMLElement, route: Route): void {
       break;
     case 'settings':
       renderSettings(main);
+      break;
+    case 'envvars':
+      renderEnvVars(main);
       break;
     default:
       renderTasks(main, { onListsChange: refreshApp });

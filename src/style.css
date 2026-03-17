@@ -904,3 +904,30 @@ body {
   font-size: 11px;
   color: var(--text-secondary);
 }
+
+/* Env vars table */
+.envvars-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-top: 12px;
+}
+.envvars-table th,
+.envvars-table td {
+  text-align: left;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border, #333);
+}
+.envvars-table th {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+.envvars-key {
+  font-family: monospace;
+  white-space: nowrap;
+}
+.envvars-val {
+  font-family: monospace;
+  word-break: break-all;
+  color: var(--accent);
+}
