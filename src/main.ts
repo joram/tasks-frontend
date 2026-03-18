@@ -2,6 +2,7 @@ import './style.css';
 import { isLoggedIn } from './auth.js';
 import { getRoute, navigateTo, initRouter } from './router.js';
 import { renderLogin } from './pages/login.js';
+import { renderEnvVars } from './pages/envvars.js';
 import { renderApp } from './app.js';
 
 function render(): void {
@@ -16,6 +17,11 @@ function render(): void {
       navigateTo({ name: 'tasks' });
       render();
     });
+    return;
+  }
+
+  if (route.name === 'envvars') {
+    renderEnvVars(document.getElementById('app')!);
     return;
   }
 
