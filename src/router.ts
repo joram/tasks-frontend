@@ -7,7 +7,7 @@ export type Route =
   | { name: 'envvars' };
 
 function getHash(): string {
-  const h = window.location.hash.slice(1) || '/';
+  const h = window.location.hash.slice(1) || window.location.pathname || '/';
   return h.startsWith('/') ? h : `/${h}`;
 }
 
