@@ -317,11 +317,10 @@ async function handleReorder(fromIndex: number, toIndex: number, indentOutdent: 
   const inTasks = tasks.find((t) => t.id === movedTask.id);
   if (inTasks) inTasks.parent_id = newParentId;
 
-  const newOrdered = getOrderedWithDepth(getFilteredTasks());
-  newOrdered.forEach(({ task }, i) => {
+  newOrder.forEach(({ task }, i) => {
     task.sort_order = i;
   });
-  const updates = newOrdered.map(({ task }, i) => ({
+  const updates = newOrder.map(({ task }, i) => ({
     id: task.id,
     sort_order: i,
     ...(task.id === movedTask.id ? { parent_id: newParentId } : {}),
@@ -613,6 +612,8 @@ function makeSortable(
 ): void {
   let draggedVisibleIndex: number | null = null;
   let dropTargetIndex: number | null = null;
+  /** Last valid drop slot from dragover (survives brief dragleave during drop). */
+  let lastDropSlot: number | null = null;
   let dragStartX = 0;
   const rowCount = () => list.querySelectorAll('.task-row').length;
   const sentinel = () => list.querySelector('.task-list-drop-sentinel');
@@ -629,6 +630,7 @@ function makeSortable(
     if (dropTargetIndex === index) return;
     clearDropTarget();
     dropTargetIndex = index;
+    lastDropSlot = index;
     const depth = index < visibleOrdered.length ? visibleOrdered[index].depth : 0;
     if (!dropIndicator) {
       dropIndicator = document.createElement('li');
@@ -656,6 +658,7 @@ function makeSortable(
     handle.addEventListener('dragend', () => {
       item.classList.remove('drag-source-placeholder');
       draggedVisibleIndex = null;
+      lastDropSlot = null;
       clearDropTarget();
     });
   });
@@ -665,6 +668,7 @@ function makeSortable(
     (e as DragEvent).dataTransfer!.dropEffect = 'move';
     if (draggedVisibleIndex == null) {
       clearDropTarget();
+      lastDropSlot = null;
       return;
     }
     const bottomZone = (e.target as HTMLElement).closest('.task-list-drop-sentinel');
@@ -684,7 +688,12 @@ function makeSortable(
     const mid = rect.top + rect.height / 2;
     const dropIndex = (e as DragEvent).clientY < mid ? toIndex : toIndex + 1;
     const clamped = Math.max(0, Math.min(dropIndex, rowCount()));
-    if (clamped !== draggedVisibleIndex) setDropTarget(clamped);
+    if (clamped === draggedVisibleIndex) {
+      clearDropTarget();
+      lastDropSlot = null;
+      return;
+    }
+    setDropTarget(clamped);
   });
 
   list.addEventListener('dragleave', (e) => {
@@ -694,7 +703,8 @@ function makeSortable(
   list.addEventListener('drop', (e) => {
     e.preventDefault();
     if (draggedVisibleIndex == null) return;
-    const useDrop = dropTargetIndex ?? draggedVisibleIndex;
+    const useDrop = dropTargetIndex ?? lastDropSlot;
+    if (useDrop == null) return;
     const fromFull = visibleOrdered[draggedVisibleIndex]?.fullIndex ?? draggedVisibleIndex;
     const toFull =
       useDrop >= visibleOrdered.length ? fullLength : visibleOrdered[useDrop]?.fullIndex ?? useDrop;
